@@ -1,29 +1,31 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, App, HttpServer};
+use actix_files::NamedFile;
+use actix_web::HttpRequest;
+use std::path::PathBuf;
+use actix_web::middleware::Logger;
+use env_logger::Env;
 
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello world!")
-}
-
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
-}
-
-async fn manual_hello() -> impl Responder {
-    HttpResponse::Ok().body("Hey there!")
+#[get("/{path:.*}")]
+async fn login(req: HttpRequest) -> actix_web::Result<NamedFile> {
+    let path: PathBuf = req.match_info().query("path").parse().unwrap();
+    Ok(NamedFile::open(path)?)
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let server = "0.0.0.0";
+    let port = 8080;
+    println!("server is running on -> http://{server}:{port}");    
+    
+    env_logger::init_from_env(Env::default().default_filter_or("info"));
+
     HttpServer::new(|| {
         App::new()
-            .service(hello)
-            .service(echo)
-            .route("/hey", web::get().to(manual_hello))
+            .service(login)
+            .wrap(Logger::default())
+            .wrap(Logger::new("%a %{User-Agent}i"))
     })
-    .bind(("127.0.0.1", 8080))?
-    .run()
-    .await
-    
+        .bind((server, port))?
+        .run()
+        .await
 }
