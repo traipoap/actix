@@ -1,10 +1,16 @@
-FROM FROM rust:1.78.0-alpine3.19 as builder
-
+FROM rust:slim as builder
 WORKDIR /usr/src/myapp
 COPY . .
+
 RUN cargo install --path .
 
-FROM debian:bullseye-slim
-RUN apt-get update && apt-get install -y extra-runtime-dependencies && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /usr/local/cargo/bin/myapp /usr/local/bin/myapp
-CMD ["myapp"]
+FROM rust:slim
+WORKDIR /usr/src/myapp
+
+RUN apt-get update -y \
+        && apt-get upgrade -y \
+        && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /usr/local/cargo/bin/actix .
+COPY --from=builder /usr/src/myapp .
+
+CMD ["./actix"]
