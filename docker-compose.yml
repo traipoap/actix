@@ -1,0 +1,14 @@
+services:
+  actix:
+    container_name: actix
+    image: ghcr.io/traipoap/actix:latest
+    build: 
+      context: .
+    expose:
+      - 8080
+    networks:
+      - proxy
+      
+networks:
+  proxy:
+    external: true
