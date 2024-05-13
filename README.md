@@ -1,1 +1,1 @@
-#### Frontend from https://github.com/AsmrProg-YT
+#### Referent: https://github.com/AsmrProg-YT
