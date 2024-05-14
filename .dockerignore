@@ -1,4 +1,7 @@
 docker-compose.yml
 Dockerfile
 actix.exe
-target
+target/
+.git/
+.gitignore/
+.DS_Store
