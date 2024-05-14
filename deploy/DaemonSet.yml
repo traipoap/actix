@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: actix
+  namespace: app
+  labels:
+    argocd.argoproj.io/instance: actix
+    role: admin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: actix
+  template:
+    metadata:
+      labels:
+        app: actix
+    spec:
+      containers:
+      - name: actix
+        image: ghcr.io/traipoap/actix:latest
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+      automountServiceAccountToken: false
+      imagePullSecrets:
+      - name: github-registry
+      serviceAccountName: container-registry
+      restartPolicy: Always
