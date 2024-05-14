@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: actix-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /D01/index.html
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
   rules:
