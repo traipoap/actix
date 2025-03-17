@@ -1,21 +1,20 @@
-use actix_web::{get, web, App, HttpServer, Responder};
+use actix_web::{get, web, App, HttpServer, Responder, Result, HttpResponse};
+use actix_web::http::StatusCode;
 use actix_web::middleware::Logger;
 use env_logger::Env;
-use actix_files::NamedFile;
+use actix_files::Files;
+use std::path::PathBuf;
 
 #[get("/")]
-async fn index() -> impl Responder {
-    "Hello, World!"
+async fn login() -> Result<HttpResponse> {
+    Ok(HttpResponse::build(StatusCode::OK)
+        .content_type("text/html;charset=utf-8")
+        .body(include_str!("../login/index.html")))
 }
 
 #[get("/hello/{name}")]
 async fn hello(name: web::Path<String>) -> impl Responder {
     format!("Hello {}!", &name)
-}
-
-#[get("/login")]
-async fn login() -> impl Responder {
-    NamedFile::open("login/index.html")
 }
 
 #[actix_web::main]
@@ -28,11 +27,10 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         App::new()
-            .service(index)
             .service(hello)
-            .service(login)
+            .service(login).service(Files::new("/", PathBuf::from("./login")).index_file("index.html").show_files_listing())
             .wrap(Logger::default())
-            .wrap(Logger::new("%a %{User-Agent}i"))
+            .wrap(Logger::new("%t %a %r %s %Dms"))
     })
         .bind((server, port))?
         .run()
