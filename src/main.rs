@@ -6,8 +6,7 @@ use actix_web::middleware::Logger;
 use env_logger::Env;
 
 // ประกาศตัวแปรสำหรับ base path
-const STATIC_DIR: &str = "./login";
-
+const STATIC_DIR: &str = "./";
 
 #[get("/{path:.*}")]
 async fn login(req: HttpRequest) -> Result<NamedFile> {
@@ -31,7 +30,7 @@ async fn login(req: HttpRequest) -> Result<NamedFile> {
     }
 
     // เปิดไฟล์และส่งกลับเป็น response
-    NamedFile::open(path).map_err(|_| error::ErrorInternalServerError("Failed to open file"))
+    NamedFile::open("./login/index.html").map_err(|_| error::ErrorInternalServerError("Failed to open file"))
 }
 
 #[actix_web::main]
